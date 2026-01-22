@@ -397,7 +397,18 @@ async function fetchGameLimits(address, proxy, privyToken, context) {
 }
 
 async function playGame(address, sessionId, proxy, privyToken, context, maxPlays) {
-  const ws = new WebSocket('wss://hub.aixcrypto.ai/ws');
+  const wsOptions = {
+    headers: {
+      'Cookie': `privy-token=${privyToken}`,
+      'Origin': 'https://hub.aixcrypto.ai',
+      'User-Agent': getRandomUserAgent(),
+      'Sec-WebSocket-Version': '13'
+    }
+  };
+  if (proxy) {
+    wsOptions.agent = newAgent(proxy);
+  }
+  const ws = new WebSocket('wss://hub.aixcrypto.ai/ws', wsOptions);
   let connected = false;
   let currentRoundId = null;
   let betsPlaced = 0;
